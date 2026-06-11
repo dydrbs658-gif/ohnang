@@ -7,7 +7,8 @@ import { PenLine } from 'lucide-react';
 import Header from '@/components/Header';
 import SkeletonItem from '@/components/SkeletonItem';
 import { supabase } from '@/lib/supabase';
-import { getDday, getDdayLabel, getDdayStyle, CATEGORY_CONFIG } from '@/lib/dday';
+import { getDday, getDdayLabel, getDdayStyle } from '@/lib/dday';
+import CategoryIcon, { STORAGE_META } from '@/components/CategoryIcon';
 
 const STORAGE_LABEL = {
   fridge: '냉장', freezer: '냉동', pantry: '실온', supplement: '영양제', etc: '기타',
@@ -119,7 +120,7 @@ function ItemDetail() {
   }
 
   const dday  = getDday(item.effective_expiry_date);
-  const cat   = CATEGORY_CONFIG[item.storage_type] ?? CATEGORY_CONFIG.etc;
+  const cat   = STORAGE_META[item.storage_type] ?? STORAGE_META.etc;
   const { bg: ddayBg, color: ddayColor } = getDdayStyle(dday);
   const ddayLabel = getDdayLabel(dday);
 
@@ -149,12 +150,7 @@ function ItemDetail() {
         <div className="mx-5 mt-4 bg-surface rounded-xl border border-border p-5">
           <div className="flex items-start gap-4">
             {/* 아이콘 */}
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
-              style={{ backgroundColor: cat.bg }}
-            >
-              {cat.emoji}
-            </div>
+            <CategoryIcon type={item.storage_type} size={64} iconSize={30} rounded="rounded-2xl" />
 
             {/* 이름 + 보조 */}
             <div className="flex-1 min-w-0 pt-1">
@@ -230,7 +226,7 @@ function ItemDetail() {
       {/* 액션 버튼 */}
       <div className="px-5 pt-3 pb-6 bg-surface border-t border-border flex flex-col gap-3">
         <button
-          onClick={() => handleAction('eaten', `${item.name} 먹었어요! 👍`)}
+          onClick={() => handleAction('eaten', `${item.name}을(를) 먹은 것으로 기록했어요`)}
           disabled={actioning}
           className="w-full h-[52px] bg-success text-white rounded-xl text-[15px] font-semibold disabled:bg-disabled transition-colors"
         >

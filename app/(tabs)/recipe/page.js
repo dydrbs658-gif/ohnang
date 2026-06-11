@@ -215,7 +215,7 @@ export default function RecipePage() {
           {/* 임박 재료 섹션 */}
           {urgentItems.length > 0 && (
             <section>
-              <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">
+              <p className="text-[13px] font-semibold text-subtext mb-3">
                 빨리 먹어야 해요
               </p>
               <div className="flex flex-wrap gap-2">
@@ -245,7 +245,7 @@ export default function RecipePage() {
           <section className="flex flex-col gap-3">
             {recipes !== null && (
               <div className="flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide">
+                <p className="text-[13px] font-semibold text-subtext">
                   오늘의 추천 요리
                 </p>
                 <button
@@ -287,7 +287,9 @@ export default function RecipePage() {
 
             {!loading && recipes !== null && recipes.length === 0 && (
               <div className="flex flex-col items-center gap-3 py-10">
-                <div className="text-4xl">🍳</div>
+                <div className="w-20 h-20 rounded-full bg-bg flex items-center justify-center">
+                  <ChefHat size={34} color="#8A94A6" strokeWidth={1.5} />
+                </div>
                 <div className="text-center">
                   <p className="text-[15px] font-semibold text-text">추천할 요리를 찾지 못했어요</p>
                   <p className="text-[13px] text-subtext mt-1">재고를 먼저 등록해보세요</p>

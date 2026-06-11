@@ -2,13 +2,13 @@
 
 import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, SearchX } from 'lucide-react';
 import Header from '@/components/Header';
 import SkeletonItem from '@/components/SkeletonItem';
+import CategoryIcon from '@/components/CategoryIcon';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { calcEffectiveExpiry } from '@/lib/calcExpiry';
-import { CATEGORY_CONFIG } from '@/lib/dday';
 
 const STORAGE_TYPES = [
   { value: 'fridge',     label: '냉장' },
@@ -20,11 +20,6 @@ const STORAGE_TYPES = [
 
 function today() {
   return new Date().toISOString().split('T')[0];
-}
-
-// storage_type → CATEGORY_CONFIG 키 매핑 (아이콘 표시용)
-function getCatConfig(item) {
-  return CATEGORY_CONFIG[item.storage_type] ?? CATEGORY_CONFIG.etc;
 }
 
 // ─── 보관 위치 선택 드롭다운 ──────────────────────────────────
@@ -64,7 +59,6 @@ function StorageSelector({ value, onChange }) {
 
 // ─── 개별 아이템 행 ────────────────────────────────────────────
 function ConfirmRow({ item, onToggle, onStorageChange, onQuantityChange }) {
-  const cat     = getCatConfig(item);
   const isExist = !!item.existingItem;
 
   return (
@@ -88,12 +82,7 @@ function ConfirmRow({ item, onToggle, onStorageChange, onQuantityChange }) {
       </button>
 
       {/* 카테고리 아이콘 */}
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-        style={{ backgroundColor: cat.bg }}
-      >
-        {cat.emoji}
-      </div>
+      <CategoryIcon type={item.storage_type} />
 
       {/* 텍스트 */}
       <div className="flex-1 min-w-0">
@@ -142,7 +131,9 @@ function ConfirmRow({ item, onToggle, onStorageChange, onQuantityChange }) {
 function EmptyResult({ onRetry }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 px-5">
-      <div className="text-4xl">🔍</div>
+      <div className="w-20 h-20 rounded-full bg-bg flex items-center justify-center">
+        <SearchX size={34} color="#8A94A6" strokeWidth={1.5} />
+      </div>
       <div className="text-center">
         <p className="text-[16px] font-semibold text-text">식품을 인식하지 못했어요</p>
         <p className="text-[13px] text-subtext mt-1 leading-relaxed">
@@ -299,7 +290,7 @@ function ConfirmContent() {
       // scan 상태 done 확인 (이미 Edge Function에서 처리했지만 안전장치)
       await supabase.from('scans').update({ status: 'done' }).eq('id', scanId);
 
-      showToast(`${checkedItems.length}개 등록됐어요 ✅`);
+      showToast(`${checkedItems.length}개 품목이 등록됐어요`);
       setTimeout(() => router.replace('/home'), 1000);
 
     } catch (err) {

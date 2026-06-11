@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 
 export default function HomeHeader() {
   return (
@@ -9,12 +9,9 @@ export default function HomeHeader() {
       <div className="flex items-center gap-2">
         <span className="text-[18px] font-bold text-primary">오냥</span>
       </div>
-      <div className="flex items-center gap-3">
-        <Link href="/search" className="flex items-center justify-center" style={{ width: '44px', height: '44px' }}>
-          <Search size={22} color="#1A1A2E" />
-        </Link>
-        <Link href="/notifications" className="flex items-center justify-center relative" style={{ width: '44px', height: '44px' }}>
-          <Bell size={22} color="#1A1A2E" />
+      <div className="flex items-center">
+        <Link href="/my/settings" className="flex items-center justify-center" style={{ width: '44px', height: '44px' }} aria-label="알림 설정">
+          <Bell size={21} color="#1A1A2E" strokeWidth={1.8} />
         </Link>
       </div>
     </header>

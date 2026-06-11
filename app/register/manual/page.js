@@ -9,11 +9,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { calcEffectiveExpiry } from '@/lib/calcExpiry';
 
 const STORAGE_TYPES = [
-  { value: 'fridge',     label: '냉장', emoji: '🥦' },
-  { value: 'freezer',    label: '냉동', emoji: '🧊' },
-  { value: 'pantry',     label: '실온', emoji: '🥫' },
-  { value: 'supplement', label: '영양제', emoji: '💊' },
-  { value: 'etc',        label: '기타', emoji: '📦' },
+  { value: 'fridge',     label: '냉장' },
+  { value: 'freezer',    label: '냉동' },
+  { value: 'pantry',     label: '실온' },
+  { value: 'supplement', label: '영양제' },
+  { value: 'etc',        label: '기타' },
 ];
 
 function today() {
@@ -301,14 +301,13 @@ export default function ManualRegisterPage() {
                     if (st.value === 'freezer') set('is_frozen', true);
                     else set('is_frozen', false);
                   }}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                     form.storage_type === st.value
                       ? 'bg-primary text-white'
                       : 'bg-surface border border-border text-subtext'
                   }`}
                 >
-                  <span>{st.emoji}</span>
-                  <span>{st.label}</span>
+                  {st.label}
                 </button>
               ))}
             </div>

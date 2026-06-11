@@ -258,7 +258,9 @@ export default function BarcodeRegisterPage() {
         {/* ── 결과: 못 찾음 ── */}
         {status === 'notfound' && (
           <div className="mt-6 bg-surface border border-border rounded-xl p-5 flex flex-col items-center gap-3">
-            <div className="text-3xl">🔍</div>
+            <div className="w-16 h-16 rounded-full bg-bg flex items-center justify-center">
+              <Barcode size={28} color="#8A94A6" strokeWidth={1.5} />
+            </div>
             <div className="text-center">
               <p className="text-[15px] font-semibold text-text">제품 정보를 찾지 못했어요</p>
               <p className="text-[13px] text-subtext mt-1 leading-relaxed">

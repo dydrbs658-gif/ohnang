@@ -60,7 +60,7 @@ export default function SwipeableItem({ onEaten, onDiscarded, children }) {
         style={{ backgroundColor: '#10B981', opacity: tx > 0 ? bgOpacity : 0 }}
         aria-hidden
       >
-        <span className="text-white text-[14px] font-semibold">먹었어요 ✓</span>
+        <span className="text-white text-[14px] font-semibold">먹었어요</span>
       </div>
 
       {/* 좌→ 버렸어요 배경 */}
@@ -69,7 +69,7 @@ export default function SwipeableItem({ onEaten, onDiscarded, children }) {
         style={{ backgroundColor: '#EF4444', opacity: tx < 0 ? bgOpacity : 0 }}
         aria-hidden
       >
-        <span className="text-white text-[14px] font-semibold">✕ 버렸어요</span>
+        <span className="text-white text-[14px] font-semibold">버렸어요</span>
       </div>
 
       {/* 실제 콘텐츠 */}

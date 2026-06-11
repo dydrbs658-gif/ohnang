@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Refrigerator } from 'lucide-react';
+import { Refrigerator, Camera, Bell, ChefHat } from 'lucide-react';
 
 export default function OnboardingIntroPage() {
   const router = useRouter();
@@ -49,11 +49,16 @@ export default function OnboardingIntroPage() {
 
         <div className="flex flex-col items-center gap-5 w-full">
           <div className="flex gap-2">
-            {['📷 사진 등록', '🔔 임박 알림', '🍳 요리 추천'].map((text, i) => (
+            {[
+              { Icon: Camera,  text: '사진 등록' },
+              { Icon: Bell,    text: '임박 알림' },
+              { Icon: ChefHat, text: '요리 추천' },
+            ].map(({ Icon, text }, i) => (
               <div
                 key={i}
-                className="flex items-center bg-surface border border-[#E8ECF2] rounded-xl px-2.5 py-2"
+                className="flex items-center gap-1.5 bg-surface border border-[#E8ECF2] rounded-full px-3 py-2"
               >
+                <Icon size={14} color="#1D6AE5" strokeWidth={1.8} />
                 <span className="text-[13px] font-medium text-text whitespace-nowrap">{text}</span>
               </div>
             ))}

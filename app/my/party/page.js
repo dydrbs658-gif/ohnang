@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Copy, Check, Pencil, Crown } from 'lucide-react';
+import { Copy, Check, Pencil, Crown, User } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,7 +74,7 @@ export default function PartyPage() {
     setJoining(true);
     try {
       await joinParty(user.id, code);
-      showToast('파티에 합류했어요 🎉');
+      showToast('파티에 합류했어요');
       setShowJoin(false);
       setJoinCode('');
       loadMembers();
@@ -150,7 +150,7 @@ export default function PartyPage() {
 
           {/* 멤버 목록 */}
           <section>
-            <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">
+            <p className="text-[13px] font-semibold text-subtext mb-3">
               멤버{members.length > 0 ? ` ${members.length}명` : ''}
             </p>
             <div className="bg-surface border border-border rounded-xl overflow-hidden">
@@ -168,8 +168,11 @@ export default function PartyPage() {
                       className="flex items-center gap-3 px-4 py-3.5"
                       style={{ borderBottom: i < members.length - 1 ? '1px solid #F0F2F5' : 'none' }}
                     >
-                      <div className="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-lg flex-shrink-0">
-                        {isCreator ? '👑' : '🙂'}
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: isCreator ? '#EFF4FF' : '#F4F6FA' }}
+                      >
+                        <User size={18} color={isCreator ? '#1D6AE5' : '#8A94A6'} strokeWidth={1.8} />
                       </div>
                       <div className="flex-1">
                         <p className="text-[15px] text-text font-medium">

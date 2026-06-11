@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, ImageIcon, RefreshCw } from 'lucide-react';
+import { Camera, ImageIcon, RefreshCw, AlertCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -203,7 +203,9 @@ export default function PhotoRegisterPage() {
         {/* ── 오류 ── */}
         {status === 'error' && (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 px-4">
-            <div className="text-4xl">😢</div>
+            <div className="w-20 h-20 rounded-full bg-[#FEE2E2] flex items-center justify-center">
+              <AlertCircle size={34} color="#EF4444" strokeWidth={1.5} />
+            </div>
             <div className="text-center">
               <p className="text-[16px] font-semibold text-text">분석에 실패했어요</p>
               <p className="text-[13px] text-subtext mt-1 leading-relaxed">{errMsg}</p>

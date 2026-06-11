@@ -101,7 +101,7 @@ export default function NotificationSettingsPage() {
     }
 
     await loadProfile(user.id);
-    showToast('저장됐어요 ✅');
+    showToast('알림 설정이 저장됐어요');
     setTimeout(() => router.back(), 800);
   };
 
@@ -124,7 +124,7 @@ export default function NotificationSettingsPage() {
           <>
             {/* 알림 빈도 */}
             <section className="mb-6">
-              <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">알림 빈도</p>
+              <p className="text-[13px] font-semibold text-subtext mb-3">알림 빈도</p>
               <div className="grid grid-cols-4 gap-2">
                 {FREQ_OPTIONS.map(opt => (
                   <button
@@ -145,7 +145,7 @@ export default function NotificationSettingsPage() {
 
             {/* 하루 횟수 */}
             <section className="mb-6">
-              <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">하루 횟수</p>
+              <p className="text-[13px] font-semibold text-subtext mb-3">하루 횟수</p>
               <div className="flex gap-2">
                 {COUNT_OPTIONS.map(n => (
                   <button
@@ -166,7 +166,7 @@ export default function NotificationSettingsPage() {
 
             {/* 알림 시간 */}
             <section className="mb-6">
-              <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">알림 시간</p>
+              <p className="text-[13px] font-semibold text-subtext mb-3">알림 시간</p>
               <div className="flex flex-col gap-3">
                 {Array.from({ length: count }, (_, i) => (
                   <div key={i} className="flex items-center gap-3">

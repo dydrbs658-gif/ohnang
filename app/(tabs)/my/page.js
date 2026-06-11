@@ -112,7 +112,7 @@ export default function MyPage() {
 
           {/* 이번 달 대시보드 */}
           <section>
-            <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">
+            <p className="text-[13px] font-semibold text-subtext mb-3">
               이번 달 리포트
             </p>
             <div className="flex gap-3">
@@ -135,7 +135,7 @@ export default function MyPage() {
                 </div>
                 <p className="text-[12px] text-subtext mt-2">
                   {eatenPct >= 80
-                    ? '훌륭해요! 음식물 낭비가 거의 없어요 🎉'
+                    ? '훌륭해요. 음식물 낭비가 거의 없어요'
                     : eatenPct >= 50
                       ? '잘하고 있어요. 임박 알림을 활용해보세요'
                       : '버려지는 식품이 많아요. 요리 추천을 활용해보세요'}
@@ -146,7 +146,7 @@ export default function MyPage() {
 
           {/* 메뉴 */}
           <section>
-            <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">
+            <p className="text-[13px] font-semibold text-subtext mb-3">
               설정
             </p>
             <div className="bg-surface border border-border rounded-xl overflow-hidden">

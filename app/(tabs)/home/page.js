@@ -2,14 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Camera, Barcode, PenLine } from 'lucide-react';
+import { Camera, Barcode, PenLine, AlertCircle, CheckCircle2, Refrigerator } from 'lucide-react';
 import HomeHeader from '@/components/HomeHeader';
 import SwipeableItem from '@/components/SwipeableItem';
 import DdayBadge from '@/components/DdayBadge';
 import SkeletonItem from '@/components/SkeletonItem';
+import CategoryIcon, { STORAGE_META } from '@/components/CategoryIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import { useItems } from '@/hooks/useItems';
-import { getDday, getSectionLabel, SECTION_ORDER, CATEGORY_CONFIG } from '@/lib/dday';
+import { getDday, getSectionLabel, SECTION_ORDER } from '@/lib/dday';
 
 const FILTERS = [
   { value: 'all',        label: '전체' },
@@ -55,7 +56,7 @@ export default function HomePage() {
   const handleEaten = async (item) => {
     try {
       await updateStatus(item.id, 'eaten');
-      showToast(`${item.name} 먹었어요! 👍`);
+      showToast(`${item.name}을(를) 먹은 것으로 기록했어요`);
     } catch {
       showToast('오류가 발생했어요');
     }
@@ -76,16 +77,25 @@ export default function HomePage() {
 
       {/* 요약 카드 */}
       <div className="mx-5 mt-4 flex-shrink-0">
-        <div className="bg-[#EFF4FF] rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-surface border border-border rounded-xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-[18px] font-semibold text-primary">
-              오늘 확인할 품목 {loading ? '…' : urgentCount}개
+            <p className="text-[13px] text-subtext">오늘 확인할 품목</p>
+            <p className="text-[22px] font-bold text-text mt-0.5">
+              {loading ? '—' : urgentCount}
+              <span className="text-[15px] font-medium text-subtext ml-0.5">개</span>
             </p>
-            <p className="text-[13px] text-subtext mt-0.5">
-              {urgentCount > 0 ? '임박한 재고를 확인해보세요' : '여유 있어요 🎉'}
+            <p className="text-[13px] text-subtext mt-1">
+              {urgentCount > 0 ? '기한이 임박한 재고가 있어요' : '모든 재고가 여유 있어요'}
             </p>
           </div>
-          <span className="text-3xl">{urgentCount > 0 ? '⚠️' : '✅'}</span>
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: urgentCount > 0 ? '#FEF3C7' : '#F0FDF4' }}
+          >
+            {urgentCount > 0
+              ? <AlertCircle size={24} color="#F59E0B" strokeWidth={1.8} />
+              : <CheckCircle2 size={24} color="#10B981" strokeWidth={1.8} />}
+          </div>
         </div>
       </div>
 
@@ -120,7 +130,7 @@ export default function HomePage() {
               <div key={label}>
                 {/* 섹션 헤더 */}
                 <div className="px-5 pt-4 pb-2">
-                  <span className="text-[13px] font-semibold text-subtext uppercase tracking-wide">
+                  <span className="text-[13px] font-semibold text-subtext">
                     {label}
                   </span>
                 </div>
@@ -129,7 +139,7 @@ export default function HomePage() {
                 <div className="bg-surface mx-5 rounded-xl overflow-hidden border border-[#E8ECF2]">
                   {sectionItems.map((item, idx) => {
                     const dday = getDday(item.effective_expiry_date);
-                    const cat  = CATEGORY_CONFIG[item.storage_type] ?? CATEGORY_CONFIG.etc;
+                    const cat  = STORAGE_META[item.storage_type] ?? STORAGE_META.etc;
                     const isLast = idx === sectionItems.length - 1;
 
                     return (
@@ -144,12 +154,7 @@ export default function HomePage() {
                             style={{ borderBottom: isLast ? 'none' : '1px solid #F0F2F5' }}
                           >
                             {/* 카테고리 아이콘 */}
-                            <div
-                              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
-                              style={{ backgroundColor: cat.bg }}
-                            >
-                              {cat.emoji}
-                            </div>
+                            <CategoryIcon type={item.storage_type} />
 
                             {/* 텍스트 */}
                             <div className="flex-1 min-w-0">
@@ -195,7 +200,12 @@ function EmptyState({ filter }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-5 gap-4">
-      <div className="text-5xl">🥬</div>
+      <div
+        className="w-20 h-20 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: '#EFF4FF' }}
+      >
+        <Refrigerator size={36} color="#1D6AE5" strokeWidth={1.5} />
+      </div>
       <div className="text-center">
         <p className="text-[16px] font-semibold text-text">
           {label ? `${label} 재고가 없어요` : '등록된 재고가 없어요'}
