@@ -15,7 +15,7 @@
 | Step 6 | 사진 AI 등록 | ✅ 완료 |
 | Step 7 | 바코드 스캔 | ✅ 완료 |
 | Step 8 | 푸시 알림 | ✅ 완료 |
-| Step 9 | 요리 추천 | 🔲 미완료 |
+| Step 9 | 요리 추천 | ✅ 완료 |
 | Step 10 | 마이 탭 / 대시보드 | 🔲 미완료 |
 
 ---
@@ -195,7 +195,9 @@ Step 8: 푸시 알림 ✅
   - lib/push.js + components/PushManager.js (FCM 토큰 등록, 네이티브 전용)
   - supabase/functions/send-expiry-notifications/index.ts (FCM v1, FCM_SERVICE_ACCOUNT 시크릿 필요, 30분 주기 cron)
   - app/my/settings/page.js (알림 설정)
-Step 9: 요리 추천 🔲
+Step 9: 요리 추천 ✅
+  - supabase/functions/recommend-recipe/index.ts (Claude API, 임박 재고 기반 3개 추천, 배포 필요)
+  - app/(tabs)/recipe/page.js (임박 재료 칩 + 추천 카드 + localStorage 일일 캐시)
 Step 10: 마이 탭 / 대시보드 🔲
 ```
 
