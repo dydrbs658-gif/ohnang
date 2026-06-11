@@ -14,7 +14,7 @@
 | Step 5 | 재고 상세 / 수정 | ✅ 완료 |
 | Step 6 | 사진 AI 등록 | ✅ 완료 |
 | Step 7 | 바코드 스캔 | ✅ 완료 |
-| Step 8 | 푸시 알림 | 🔲 미완료 |
+| Step 8 | 푸시 알림 | ✅ 완료 |
 | Step 9 | 요리 추천 | 🔲 미완료 |
 | Step 10 | 마이 탭 / 대시보드 | 🔲 미완료 |
 
@@ -190,7 +190,11 @@ Step 7: 바코드 스캔 ✅
   - supabase/functions/barcode-lookup/index.ts (식품안전나라 C005 API — FOOD_SAFETY_API_KEY 시크릿 필요, 배포 필요)
   - app/register/barcode/page.js (네이티브 ML Kit + 웹 BarcodeDetector + 수동 입력 폴백)
   - app/register/manual/page.js (sessionStorage 'register_prefill' 프리필 지원)
-Step 8: 푸시 알림 🔲
+Step 8: 푸시 알림 ✅
+  - supabase/migrations/005_push_tokens.sql (push_token 컬럼 + notification_logs + pg_cron 가이드)
+  - lib/push.js + components/PushManager.js (FCM 토큰 등록, 네이티브 전용)
+  - supabase/functions/send-expiry-notifications/index.ts (FCM v1, FCM_SERVICE_ACCOUNT 시크릿 필요, 30분 주기 cron)
+  - app/my/settings/page.js (알림 설정)
 Step 9: 요리 추천 🔲
 Step 10: 마이 탭 / 대시보드 🔲
 ```
