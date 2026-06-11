@@ -8,7 +8,7 @@ import OnboardingProgress from '@/components/OnboardingProgress';
 
 export default function PartyPage() {
   const router = useRouter();
-  const { user, createProfileAndParty } = useAuth();
+  const { user, createProfileAndParty, signInAnonymously } = useAuth();
 
   const [type,    setType]    = useState(null);   // 'solo' | 'group'
   const [loading, setLoading] = useState(false);
@@ -29,8 +29,11 @@ export default function PartyPage() {
     setLoading(true);
     setError('');
     try {
+      // 앞 단계에서 로그인이 안 된 채 진입한 경우 여기서 복구
+      const userId = user?.id ?? (await signInAnonymously()).id;
+
       const notificationSettings = getNotificationSettings();
-      const result = await createProfileAndParty(user.id, {
+      const result = await createProfileAndParty(userId, {
         notificationSettings,
         partyType,
         partyName: partyType === 'group' ? '우리 집' : '내 냉장고',

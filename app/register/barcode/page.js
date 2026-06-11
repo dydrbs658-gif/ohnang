@@ -135,6 +135,11 @@ export default function BarcodeRegisterPage() {
     return () => stopWebScan();
   }, [scanNative, startWebScan, stopWebScan]);
 
+  // 카메라를 못 쓰면 수동 입력 모드로 자동 전환
+  useEffect(() => {
+    if (cameraOk === false) setMode('manual');
+  }, [cameraOk]);
+
   // 다시 스캔
   const resetScan = () => {
     setStatus('idle');
@@ -238,13 +243,15 @@ export default function BarcodeRegisterPage() {
             >
               {isLookingUp ? '조회 중...' : '조회하기'}
             </button>
-            <button
-              onClick={() => { setMode('scanning'); resetScan(); startWebScan(); }}
-              className="flex items-center justify-center gap-1.5 text-[14px] text-primary mx-auto"
-            >
-              <Barcode size={15} />
-              카메라로 스캔하기
-            </button>
+            {cameraOk !== false && (
+              <button
+                onClick={() => { setMode('scanning'); resetScan(); startWebScan(); }}
+                className="flex items-center justify-center gap-1.5 text-[14px] text-primary mx-auto"
+              >
+                <Barcode size={15} />
+                카메라로 스캔하기
+              </button>
+            )}
           </div>
         )}
 

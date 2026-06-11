@@ -34,8 +34,14 @@ export default function RegisterPage() {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-end">
-      <div className="w-full bg-surface rounded-t-3xl pb-safe">
+    <div
+      className="fixed inset-0 bg-black/40 z-50 flex items-end"
+      onClick={() => router.back()}
+    >
+      <div
+        className="w-full bg-surface rounded-t-3xl pb-safe"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex justify-center pt-3 mb-4">
           <div className="w-10 h-1 bg-[#E8ECF2] rounded-full" />
         </div>

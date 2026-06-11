@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function PartyPage() {
   const { user, profile, loadProfile, joinParty } = useAuth();
   const party   = profile?.parties;
-  const isOwner = party?.created_by === user?.id;
+  const isOwner = !!user?.id && party?.created_by === user.id;
 
   const [members,    setMembers]    = useState([]);
   const [editing,    setEditing]    = useState(false);
@@ -151,7 +151,7 @@ export default function PartyPage() {
           {/* 멤버 목록 */}
           <section>
             <p className="text-[13px] font-semibold text-subtext uppercase tracking-wide mb-3">
-              멤버 {members.length > 0 ? members.length : ''}명
+              멤버{members.length > 0 ? ` ${members.length}명` : ''}
             </p>
             <div className="bg-surface border border-border rounded-xl overflow-hidden">
               {members.length === 0 ? (

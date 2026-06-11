@@ -207,6 +207,8 @@ Step 10: 마이 탭 / 대시보드 ✅
 ---
 
 ## 배포 체크리스트 (Steps 7~10 백엔드)
+0. **익명 인증 활성화 (필수, 현재 꺼져 있음)**: Dashboard > Authentication > Sign In / Providers > Anonymous sign-ins ON
+   — 꺼져 있으면 온보딩에서 "연결에 실패했어요" 에러가 뜬다
 1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`
 2. **Edge Function 배포**: `supabase functions deploy barcode-lookup recommend-recipe send-expiry-notifications`
 3. **시크릿 설정** (`supabase secrets set`):

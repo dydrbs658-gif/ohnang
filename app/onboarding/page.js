@@ -9,9 +9,11 @@ export default function OnboardingIntroPage() {
   const router = useRouter();
   const { signInAnonymously, user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState('');
 
   const handleStart = async () => {
     setLoading(true);
+    setError('');
     try {
       if (!user) {
         await signInAnonymously();
@@ -19,8 +21,8 @@ export default function OnboardingIntroPage() {
       router.push('/onboarding/permissions');
     } catch (err) {
       console.error('익명 로그인 실패:', err);
-      // 실패해도 온보딩 진행 (오프라인 대비)
-      router.push('/onboarding/permissions');
+      // 로그인 없이 진행하면 파티 생성에서 막히므로 여기서 멈추고 재시도 유도
+      setError('연결에 실패했어요. 네트워크를 확인하고 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
@@ -46,13 +48,13 @@ export default function OnboardingIntroPage() {
         </div>
 
         <div className="flex flex-col items-center gap-5 w-full">
-          <div className="flex gap-4">
-            {['📷 사진 등록', '🔔 유통기한 알림', '🍳 요리 추천'].map((text, i) => (
+          <div className="flex gap-2">
+            {['📷 사진 등록', '🔔 임박 알림', '🍳 요리 추천'].map((text, i) => (
               <div
                 key={i}
-                className="flex items-center gap-1.5 bg-surface border border-[#E8ECF2] rounded-xl px-3 py-2"
+                className="flex items-center bg-surface border border-[#E8ECF2] rounded-xl px-2.5 py-2"
               >
-                <span className="text-[13px] font-medium text-text">{text}</span>
+                <span className="text-[13px] font-medium text-text whitespace-nowrap">{text}</span>
               </div>
             ))}
           </div>
@@ -60,6 +62,9 @@ export default function OnboardingIntroPage() {
       </div>
 
       <div className="pb-12">
+        {error && (
+          <p className="text-[13px] text-danger text-center mb-3">{error}</p>
+        )}
         <button
           onClick={handleStart}
           disabled={loading}
