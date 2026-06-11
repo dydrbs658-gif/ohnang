@@ -174,12 +174,7 @@ function ConfirmContent() {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
 
   // ── scan 결과 로드 ──
-  useEffect(() => {
-    if (!scanId || !profile?.party_id) return;
-    loadScanResult();
-  }, [scanId, profile?.party_id]);
-
-  const loadScanResult = async () => {
+  const loadScanResult = useCallback(async () => {
     setLoading(true);
 
     const { data: scan } = await supabase
@@ -227,7 +222,12 @@ function ConfirmContent() {
 
     setItems(enriched);
     setLoading(false);
-  };
+  }, [scanId, profile?.party_id]);
+
+  useEffect(() => {
+    if (!scanId || !profile?.party_id) return;
+    loadScanResult();
+  }, [scanId, profile?.party_id, loadScanResult]);
 
   const toggle = useCallback((idx) => {
     setItems(prev => prev.map(i => i._idx === idx ? { ...i, checked: !i.checked } : i));

@@ -206,6 +206,19 @@ Step 10: 마이 탭 / 대시보드 ✅
 
 ---
 
+## 배포 체크리스트 (Steps 7~10 백엔드)
+1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`
+2. **Edge Function 배포**: `supabase functions deploy barcode-lookup recommend-recipe send-expiry-notifications`
+3. **시크릿 설정** (`supabase secrets set`):
+   - `FOOD_SAFETY_API_KEY` — 식품안전나라 OpenAPI 키 (barcode-lookup)
+   - `FCM_SERVICE_ACCOUNT` — Firebase 서비스 계정 JSON 전체 문자열 (send-expiry-notifications)
+   - `ANTHROPIC_API_KEY` — 이미 설정됨 (analyze-photo, recommend-recipe 공용)
+4. **pg_cron 등록**: 005 마이그레이션 하단 주석 참고 — 매 30분 send-expiry-notifications 호출
+5. **FCM 네이티브 설정**: `npx cap sync` 후 Android `google-services.json` / iOS APNs 키 등록
+6. **바코드 네이티브**: ML Kit 플러그인 포함됨 — Android는 Google Barcode Scanner 모듈 자동 설치, 실패 시 앱 내 수동 입력 폴백 동작
+
+---
+
 ## 코드 품질 규칙
 - 컴포넌트: `/components`, 페이지: `/app` (App Router)
 - Supabase 호출: `/lib/supabase.js` 에서만

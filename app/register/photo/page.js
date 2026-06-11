@@ -187,8 +187,11 @@ export default function PhotoRegisterPage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt="분석 중" className="w-full h-full object-cover opacity-50" />
               {/* 로딩 오버레이 */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <div className="w-full max-w-[200px] flex flex-col gap-2 px-6">
+                  <div className="h-3 bg-white/40 animate-pulse rounded-xl" />
+                  <div className="h-3 bg-white/25 animate-pulse rounded-xl w-3/4 mx-auto" />
+                </div>
                 <p className="text-white text-[14px] font-semibold drop-shadow-lg">
                   {status === 'uploading' ? '사진 업로드 중...' : 'AI가 식품을 인식하고 있어요...'}
                 </p>
