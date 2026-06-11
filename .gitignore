@@ -38,3 +38,6 @@ next-env.d.ts
 # Capacitor
 /ios
 /android
+
+# Supabase CLI
+supabase/.temp

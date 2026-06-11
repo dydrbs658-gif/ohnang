@@ -183,7 +183,7 @@ Step 5: 재고 상세 / 수정 ✅
   - app/item/edit/page.js (수정 + 삭제)
 Step 6: 사진 AI 등록 ✅
   - supabase/migrations/004_scans_schema.sql
-  - supabase/functions/analyze-photo/index.js (Claude Vision API)
+  - supabase/functions/analyze-photo/index.ts (Claude Vision API, 배포 완료)
   - app/register/photo/page.js (촬영/갤러리 선택 + 업로드)
   - app/register/confirm/page.js (결과 확인 + 일괄 등록)
 Step 7: 바코드 스캔 🔲
