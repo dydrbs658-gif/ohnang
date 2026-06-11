@@ -1,0 +1,73 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { Refrigerator } from 'lucide-react';
+
+export default function OnboardingIntroPage() {
+  const router = useRouter();
+  const { signInAnonymously, user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleStart = async () => {
+    setLoading(true);
+    try {
+      if (!user) {
+        await signInAnonymously();
+      }
+      router.push('/onboarding/permissions');
+    } catch (err) {
+      console.error('익명 로그인 실패:', err);
+      // 실패해도 온보딩 진행 (오프라인 대비)
+      router.push('/onboarding/permissions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-bg px-5 pt-safe">
+      <div className="flex-1 flex flex-col items-center justify-center gap-10">
+        <div
+          className="w-32 h-32 rounded-3xl flex items-center justify-center"
+          style={{ backgroundColor: '#EFF4FF' }}
+        >
+          <Refrigerator size={64} color="#1D6AE5" />
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-[26px] font-bold text-text leading-snug">
+            유통기한,<br />이제 신경 쓰지 마세요
+          </h1>
+          <p className="text-[15px] text-subtext mt-3 leading-relaxed">
+            사진 한 장으로 등록하고<br />임박하면 알림으로 알려드려요
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-5 w-full">
+          <div className="flex gap-4">
+            {['📷 사진 등록', '🔔 유통기한 알림', '🍳 요리 추천'].map((text, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-1.5 bg-surface border border-[#E8ECF2] rounded-xl px-3 py-2"
+              >
+                <span className="text-[13px] font-medium text-text">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="pb-12">
+        <button
+          onClick={handleStart}
+          disabled={loading}
+          className="w-full h-[52px] bg-primary text-white rounded-xl text-[15px] font-semibold disabled:bg-disabled transition-colors"
+        >
+          {loading ? '잠깐만요...' : '시작하기'}
+        </button>
+      </div>
+    </div>
+  );
+}
