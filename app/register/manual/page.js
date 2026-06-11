@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import Header from '@/components/Header';
@@ -114,6 +114,41 @@ export default function ManualRegisterPage() {
   const [toast,        setToast]        = useState(null);
 
   const suggestTimer = useRef(null);
+
+  // 바코드 스캔 결과 프리필 (sessionStorage 경유)
+  useEffect(() => {
+    let prefill = null;
+    try {
+      const raw = sessionStorage.getItem('register_prefill');
+      if (raw) prefill = JSON.parse(raw);
+    } catch { /* 손상된 데이터 무시 */ }
+    if (!prefill) return;
+
+    sessionStorage.removeItem('register_prefill');
+
+    setForm(f => ({
+      ...f,
+      name:         prefill.name         || f.name,
+      storage_type: prefill.storage_type || f.storage_type,
+      unit:         prefill.unit         || f.unit,
+      is_frozen:    prefill.storage_type === 'freezer',
+    }));
+
+    // 카탈로그 매칭이 있으면 그대로, 없으면 공공 API 유통기한으로 가상 카탈로그 구성
+    if (prefill.catalog) {
+      setCatalog(prefill.catalog);
+    } else if (prefill.shelf_days) {
+      setCatalog({
+        id:           null,
+        name:         prefill.name,
+        category:     prefill.category ?? 'etc',
+        default_unit: prefill.unit ?? '개',
+        shelf_days:   prefill.shelf_days,
+        opened_days:  null,
+        frozen_days:  null,
+      });
+    }
+  }, []);
 
   const set = useCallback((key, val) => {
     setForm(f => ({ ...f, [key]: val }));

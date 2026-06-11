@@ -13,7 +13,7 @@
 | Step 4 | 직접 입력 등록 | ✅ 완료 |
 | Step 5 | 재고 상세 / 수정 | ✅ 완료 |
 | Step 6 | 사진 AI 등록 | ✅ 완료 |
-| Step 7 | 바코드 스캔 | 🔲 미완료 |
+| Step 7 | 바코드 스캔 | ✅ 완료 |
 | Step 8 | 푸시 알림 | 🔲 미완료 |
 | Step 9 | 요리 추천 | 🔲 미완료 |
 | Step 10 | 마이 탭 / 대시보드 | 🔲 미완료 |
@@ -186,7 +186,10 @@ Step 6: 사진 AI 등록 ✅
   - supabase/functions/analyze-photo/index.ts (Claude Vision API, 배포 완료)
   - app/register/photo/page.js (촬영/갤러리 선택 + 업로드)
   - app/register/confirm/page.js (결과 확인 + 일괄 등록)
-Step 7: 바코드 스캔 🔲
+Step 7: 바코드 스캔 ✅
+  - supabase/functions/barcode-lookup/index.ts (식품안전나라 C005 API — FOOD_SAFETY_API_KEY 시크릿 필요, 배포 필요)
+  - app/register/barcode/page.js (네이티브 ML Kit + 웹 BarcodeDetector + 수동 입력 폴백)
+  - app/register/manual/page.js (sessionStorage 'register_prefill' 프리필 지원)
 Step 8: 푸시 알림 🔲
 Step 9: 요리 추천 🔲
 Step 10: 마이 탭 / 대시보드 🔲
