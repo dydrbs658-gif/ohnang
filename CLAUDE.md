@@ -16,7 +16,7 @@
 | Step 7 | 바코드 스캔 | ✅ 완료 |
 | Step 8 | 푸시 알림 | ✅ 완료 |
 | Step 9 | 요리 추천 | ✅ 완료 |
-| Step 10 | 마이 탭 / 대시보드 | 🔲 미완료 |
+| Step 10 | 마이 탭 / 대시보드 | ✅ 완료 |
 
 ---
 
@@ -198,7 +198,10 @@ Step 8: 푸시 알림 ✅
 Step 9: 요리 추천 ✅
   - supabase/functions/recommend-recipe/index.ts (Claude API, 임박 재고 기반 3개 추천, 배포 필요)
   - app/(tabs)/recipe/page.js (임박 재료 칩 + 추천 카드 + localStorage 일일 캐시)
-Step 10: 마이 탭 / 대시보드 🔲
+Step 10: 마이 탭 / 대시보드 ✅
+  - supabase/migrations/006_party_members.sql (my_party_id() SECURITY DEFINER + 파티 멤버 조회 정책)
+  - app/(tabs)/my/page.js (파티 카드, 이번 달 리포트, 먹은 비율, 설정 메뉴)
+  - app/my/party/page.js (파티명 수정, 초대코드 복사, 멤버 목록, 파티 합류)
 ```
 
 ---
