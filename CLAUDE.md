@@ -207,6 +207,11 @@ Step 11-B: 브랜딩 확정 ✅
   - components/BrandLogo.js (BrandSymbol/BrandLogo/BrandHero — 미니멀 냉장고+잎사귀 심볼)
   - resources/icon.svg (앱 아이콘 원본 1024px) + resources/README.md (에셋 생성 절차)
   - 적용처: HomeHeader 워드마크, 온보딩 히어로, 홈 빈 화면, layout.js title, capacitor.config.js
+Step 12: 사용성 개선 (고객 관점) ✅
+  - register/manual: 단위 빠른 선택 칩(개/팩/병/g/kg/ml/L/봉지), 유통기한 프리셋 칩(+3일~+3개월)
+  - recipe: 재료 직접 선택 → 추천 (임박 재료 기본 선택, 선택 재료 필수 사용)
+  - supabase/functions/recommend-recipe: selected_names 파라미터 추가 — **재배포 필요**
+  - shopping: "다시 채울 때 됐어요" 재구매 제안 (최근 45일 먹은 기록 기반), 가격 알림 티저(곧 제공)
 Step 11: 런칭 전 UX 보강 ✅
   - supabase/migrations/007_shopping_list.sql (shopping_items 테이블 + RLS + Realtime)
   - app/(tabs)/shopping/page.js (파티 공유 장보기: 추가/체크/삭제, 구매 완료 → 재고 등록 프리필)

@@ -16,8 +16,24 @@ const STORAGE_TYPES = [
   { value: 'etc',        label: '기타' },
 ];
 
+const COMMON_UNITS = ['개', '팩', '병', 'g', 'kg', 'ml', 'L', '봉지'];
+
+const EXPIRY_PRESETS = [
+  { label: '+3일',   days: 3 },
+  { label: '+1주',   days: 7 },
+  { label: '+2주',   days: 14 },
+  { label: '+1개월', days: 30 },
+  { label: '+3개월', days: 90 },
+];
+
 function today() {
   return new Date().toISOString().split('T')[0];
+}
+
+function addDays(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
 }
 
 // ─── Toggle 컴포넌트 ────────────────────────────────────────
@@ -326,21 +342,61 @@ export default function ManualRegisterPage() {
                 className="w-20 h-[52px] bg-bg border border-border rounded-xl px-3 text-[15px] text-center text-text outline-none focus:border-primary"
               />
             </div>
+            {/* 단위 빠른 선택 */}
+            <div className="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
+              {COMMON_UNITS.map(u => (
+                <button
+                  key={u}
+                  type="button"
+                  onClick={() => set('unit', u)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
+                    form.unit === u
+                      ? 'bg-primary text-white'
+                      : 'bg-surface border border-border text-subtext'
+                  }`}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* 유통기한 */}
-          <DateInput
-            label="유통기한"
-            value={form.label_expiry_date}
-            onChange={v => set('label_expiry_date', v)}
-            hint={
-              !form.label_expiry_date
-                ? catalog
-                  ? `카탈로그 기준 자동 계산돼요 (구매일로부터 ${catalog.shelf_days}일)`
-                  : '입력 안 하면 날짜 미정으로 등록돼요'
-                : undefined
-            }
-          />
+          <div>
+            <DateInput
+              label="유통기한"
+              value={form.label_expiry_date}
+              onChange={v => set('label_expiry_date', v)}
+              hint={
+                !form.label_expiry_date
+                  ? catalog
+                    ? `카탈로그 기준 자동 계산돼요 (구매일로부터 ${catalog.shelf_days}일)`
+                    : '입력 안 하면 날짜 미정으로 등록돼요'
+                  : undefined
+              }
+            />
+            {/* 기한 빠른 선택 */}
+            <div className="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
+              {EXPIRY_PRESETS.map(p => {
+                const date = addDays(p.days);
+                const active = form.label_expiry_date === date;
+                return (
+                  <button
+                    key={p.days}
+                    type="button"
+                    onClick={() => set('label_expiry_date', active ? '' : date)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
+                      active
+                        ? 'bg-primary text-white'
+                        : 'bg-surface border border-border text-subtext'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* 개봉 여부 */}
           <div className="bg-surface border border-border rounded-xl overflow-hidden">

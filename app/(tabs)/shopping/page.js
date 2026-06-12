@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, X, ShoppingCart, Check, PackagePlus } from 'lucide-react';
+import { Plus, X, ShoppingCart, Check, PackagePlus, RotateCcw, BellRing } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +28,7 @@ export default function ShoppingPage() {
   const partyId = profile?.party_id;
 
   const [list,    setList]    = useState([]);
+  const [suggest, setSuggest] = useState([]); // 재구매 제안 (먹은 기록 기반)
   const [loading, setLoading] = useState(true);
   const [name,    setName]    = useState('');
   const [adding,  setAdding]  = useState(false);
@@ -63,6 +64,43 @@ export default function ShoppingPage() {
 
     return () => { supabase.removeChannel(channel); };
   }, [partyId, fetchList]);
+
+  // 재구매 제안: 최근 45일 내 먹은 품목 중 현재 재고에 없는 것
+  useEffect(() => {
+    if (!partyId) return;
+    (async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 45);
+
+      const [eatenRes, activeRes] = await Promise.all([
+        supabase
+          .from('items')
+          .select('name, unit, eaten_at')
+          .eq('party_id', partyId)
+          .eq('status', 'eaten')
+          .gte('eaten_at', since.toISOString())
+          .order('eaten_at', { ascending: false })
+          .limit(100),
+        supabase
+          .from('items')
+          .select('name')
+          .eq('party_id', partyId)
+          .eq('status', 'active')
+          .limit(200),
+      ]);
+      if (eatenRes.error || activeRes.error) return;
+
+      const activeNames = new Set((activeRes.data ?? []).map(i => i.name));
+      const map = new Map();
+      for (const it of eatenRes.data ?? []) {
+        if (activeNames.has(it.name)) continue;
+        const cur = map.get(it.name);
+        if (cur) cur.count += 1;
+        else map.set(it.name, { name: it.name, unit: it.unit, count: 1 });
+      }
+      setSuggest(Array.from(map.values()).slice(0, 6));
+    })();
+  }, [partyId]);
 
   // ── 추가 ───────────────────────────────────────────────────
   const handleAdd = async (e) => {
@@ -141,8 +179,27 @@ export default function ShoppingPage() {
     }
   };
 
+  // 재구매 제안에 담기
+  const addSuggested = async (s) => {
+    setSuggest(prev => prev.filter(x => x.name !== s.name));
+    const { error } = await supabase.from('shopping_items').insert({
+      party_id:   partyId,
+      name:       s.name,
+      unit:       s.unit || '개',
+      created_by: user?.id,
+    });
+    if (error) {
+      showToast('담지 못했어요');
+      return;
+    }
+    showToast(`${s.name}을(를) 장보기에 담았어요`);
+    fetchList();
+  };
+
   const pending = list.filter(i => !i.is_checked);
   const checked = list.filter(i => i.is_checked);
+  // 이미 목록에 있는 품목은 제안에서 숨김
+  const visibleSuggest = suggest.filter(s => !list.some(i => i.name === s.name));
 
   return (
     <div className="flex flex-col h-full bg-bg">
@@ -175,24 +232,62 @@ export default function ShoppingPage() {
         <div className="px-5 py-5 flex flex-col gap-6">
           {loading ? (
             <ShoppingSkeleton />
-          ) : list.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-4">
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#EFF4FF' }}
-              >
-                <ShoppingCart size={36} color="#1D6AE5" strokeWidth={1.5} />
-              </div>
-              <div className="text-center">
-                <p className="text-[16px] font-semibold text-text">장보기 목록이 비어 있어요</p>
-                <p className="text-[14px] text-subtext mt-1 leading-relaxed">
-                  살 것을 적어두면 파티원과 실시간으로 공유돼요.<br />
-                  다 먹은 재고도 여기로 보낼 수 있어요
-                </p>
-              </div>
-            </div>
           ) : (
             <>
+              {/* 다시 채울 때 됐어요 (먹은 기록 기반 재구매 제안) */}
+              {visibleSuggest.length > 0 && (
+                <section>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <RotateCcw size={14} color="#0EA5A0" />
+                    <p className="text-[13px] font-semibold text-subtext">다시 채울 때 됐어요</p>
+                  </div>
+                  <p className="text-[12px] text-subtext mb-3">
+                    최근에 다 먹었는데 냉장고에 없는 품목이에요
+                  </p>
+                  <div className="bg-surface border border-border rounded-xl overflow-hidden">
+                    {visibleSuggest.map((s, idx) => (
+                      <div
+                        key={s.name}
+                        className="flex items-center gap-3 px-4 py-3"
+                        style={{ borderBottom: idx < visibleSuggest.length - 1 ? '1px solid #F0F2F5' : 'none' }}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[15px] text-text font-medium truncate">{s.name}</p>
+                          {s.count > 1 && (
+                            <p className="text-[12px] text-subtext mt-0.5">최근 {s.count}번 소비했어요</p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => addSuggested(s)}
+                          className="flex items-center gap-1 text-[12px] font-medium text-secondary bg-[#ECFDF5] rounded-full px-2.5 py-1.5 flex-shrink-0 active:opacity-70"
+                        >
+                          <Plus size={13} />
+                          담기
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {list.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#EFF4FF' }}
+                  >
+                    <ShoppingCart size={36} color="#1D6AE5" strokeWidth={1.5} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[16px] font-semibold text-text">장보기 목록이 비어 있어요</p>
+                    <p className="text-[14px] text-subtext mt-1 leading-relaxed">
+                      살 것을 적어두면 파티원과 실시간으로 공유돼요.<br />
+                      다 먹은 재고도 여기로 보낼 수 있어요
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
               {/* 살 것 */}
               {pending.length > 0 && (
                 <section>
@@ -279,6 +374,31 @@ export default function ShoppingPage() {
                   </p>
                 </section>
               )}
+                </>
+              )}
+
+              {/* 가격 알림 (준비 중 티저) */}
+              <section className="bg-surface border border-border rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#FEF3C7' }}
+                  >
+                    <BellRing size={20} color="#F59E0B" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[15px] font-medium text-text">가격 알림</p>
+                      <span className="text-[11px] font-semibold text-subtext bg-bg rounded-full px-2 py-0.5">
+                        곧 제공
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-subtext mt-1 leading-relaxed">
+                      자주 사는 품목의 할인·최저가 타이밍을 알려드릴 예정이에요
+                    </p>
+                  </div>
+                </div>
+              </section>
             </>
           )}
         </div>

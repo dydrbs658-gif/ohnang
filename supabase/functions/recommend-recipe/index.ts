@@ -1,5 +1,6 @@
 // Supabase Edge Function: recommend-recipe
-// POST { party_id } → { recipes: [...], based_on: [...] }
+// POST { party_id, selected_names? } → { recipes: [...], based_on: [...] }
+// selected_names: 사용자가 직접 고른 재료 이름 배열 (있으면 반드시 활용)
 // 필수 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY
 
 import { serve }        from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -72,8 +73,12 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { party_id } = await req.json();
+    const { party_id, selected_names } = await req.json();
     if (!party_id) return json({ error: 'party_id 가 필요합니다' }, 400);
+
+    const selectedList: string[] = Array.isArray(selected_names)
+      ? selected_names.filter((n: unknown) => typeof n === 'string').slice(0, 15)
+      : [];
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -125,7 +130,11 @@ serve(async (req: Request): Promise<Response> => {
         messages: [
           {
             role:    'user',
-            content: `현재 재고 목록 (유통기한 임박 순):\n${lines.join('\n')}\n\n이 재고로 만들 수 있는 요리 3가지를 추천해주세요.`,
+            content:
+              `현재 재고 목록 (유통기한 임박 순):\n${lines.join('\n')}\n\n` +
+              (selectedList.length > 0
+                ? `사용자가 꼭 쓰고 싶은 재료: ${selectedList.join(', ')}\n위 재료를 각 요리마다 최소 1개 이상 반드시 사용해서 요리 3가지를 추천해주세요.`
+                : '이 재고로 만들 수 있는 요리 3가지를 추천해주세요.'),
           },
         ],
       }),
@@ -152,11 +161,13 @@ serve(async (req: Request): Promise<Response> => {
       recipes = [];
     }
 
-    // 추천 근거가 된 임박 재료 (상위 5개)
-    const basedOn = items
-      .filter(i => i.effective_expiry_date)
-      .slice(0, 5)
-      .map(i => i.name);
+    // 추천 근거 재료: 사용자 선택 우선, 없으면 임박 상위 5개
+    const basedOn = selectedList.length > 0
+      ? selectedList.slice(0, 5)
+      : items
+          .filter(i => i.effective_expiry_date)
+          .slice(0, 5)
+          .map(i => i.name);
 
     return json({ recipes, based_on: basedOn });
 

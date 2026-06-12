@@ -147,30 +147,35 @@ export default function RecipePage() {
   const { profile } = useAuth();
   const partyId = profile?.party_id;
 
-  const [urgentItems, setUrgentItems] = useState([]);
+  const [items,       setItems]       = useState([]);
+  const [selected,    setSelected]    = useState(new Set()); // 선택한 재료 id
   const [recipes,     setRecipes]     = useState(null);  // null = 아직 추천 안 받음
   const [basedOn,     setBasedOn]     = useState([]);
   const [loading,     setLoading]     = useState(false);
   const [itemsLoaded, setItemsLoaded] = useState(false);
   const [errMsg,      setErrMsg]      = useState(null);
 
-  // 임박 재고 로드 (D-7 이내)
+  // 재고 로드 (임박 순) + 임박 재료(D-7) 기본 선택
   useEffect(() => {
     if (!partyId) return;
     (async () => {
-      const limit = new Date();
-      limit.setDate(limit.getDate() + 7);
       const { data, error } = await supabase
         .from('items')
         .select('id, name, effective_expiry_date')
         .eq('party_id', partyId)
         .eq('status', 'active')
         .neq('storage_type', 'supplement')
-        .not('effective_expiry_date', 'is', null)
-        .lte('effective_expiry_date', limit.toISOString().split('T')[0])
-        .order('effective_expiry_date', { ascending: true })
-        .limit(8);
-      if (!error) setUrgentItems(data ?? []);
+        .order('effective_expiry_date', { ascending: true, nullsFirst: false })
+        .limit(30);
+      if (!error) {
+        const list = data ?? [];
+        setItems(list);
+        const urgent = list.filter(i => {
+          const d = getDday(i.effective_expiry_date);
+          return d !== null && d <= 7;
+        }).slice(0, 8);
+        setSelected(new Set(urgent.map(i => i.id)));
+      }
       setItemsLoaded(true);
     })();
 
@@ -182,14 +187,27 @@ export default function RecipePage() {
     }
   }, [partyId]);
 
+  const toggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const fetchRecipes = useCallback(async () => {
     if (!partyId || loading) return;
     setLoading(true);
     setErrMsg(null);
 
+    const selectedNames = items
+      .filter(i => selected.has(i.id))
+      .map(i => i.name);
+
     try {
       const { data, error } = await supabase.functions.invoke('recommend-recipe', {
-        body: { party_id: partyId },
+        body: { party_id: partyId, selected_names: selectedNames },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -203,7 +221,7 @@ export default function RecipePage() {
     } finally {
       setLoading(false);
     }
-  }, [partyId, loading]);
+  }, [partyId, loading, items, selected]);
 
   return (
     <div className="flex flex-col h-full bg-bg">
@@ -212,29 +230,48 @@ export default function RecipePage() {
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5 flex flex-col gap-6">
 
-          {/* 임박 재료 섹션 */}
-          {urgentItems.length > 0 && (
+          {/* 재료 고르기 섹션 */}
+          {items.length > 0 && (
             <section>
-              <p className="text-[13px] font-semibold text-subtext mb-3">
-                빨리 먹어야 해요
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[13px] font-semibold text-subtext">
+                  쓸 재료 고르기
+                </p>
+                <span className="text-[12px] text-subtext">
+                  {selected.size > 0 ? `${selected.size}개 선택` : ''}
+                </span>
+              </div>
+              <p className="text-[12px] text-subtext mb-3">
+                선택한 재료를 꼭 사용하는 요리를 추천해드려요 · 임박한 재료는 미리 골라뒀어요
               </p>
               <div className="flex flex-wrap gap-2">
-                {urgentItems.map(item => {
-                  const dday  = getDday(item.effective_expiry_date);
-                  const style = getDdayStyle(dday);
+                {items.map(item => {
+                  const dday   = getDday(item.effective_expiry_date);
+                  const style  = getDdayStyle(dday);
+                  const active = selected.has(item.id);
                   return (
-                    <span
+                    <button
                       key={item.id}
-                      className="flex items-center gap-1.5 bg-surface border border-border rounded-full pl-3 pr-1.5 py-1.5 text-[13px] text-text"
+                      type="button"
+                      onClick={() => toggleSelect(item.id)}
+                      className={`flex items-center gap-1.5 rounded-full pl-3 pr-1.5 py-1.5 text-[13px] transition-colors border ${
+                        active
+                          ? 'bg-primary border-primary text-white font-medium'
+                          : 'bg-surface border-border text-text'
+                      }`}
                     >
                       {item.name}
                       <span
                         className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full"
-                        style={{ backgroundColor: style.bg, color: style.color }}
+                        style={
+                          active
+                            ? { backgroundColor: 'rgba(255,255,255,0.25)', color: '#FFFFFF' }
+                            : { backgroundColor: style.bg, color: style.color }
+                        }
                       >
                         {getDdayLabel(dday)}
                       </span>
-                    </span>
+                    </button>
                   );
                 })}
               </div>
@@ -280,7 +317,7 @@ export default function RecipePage() {
                   disabled={!itemsLoaded || !partyId}
                   className="w-full h-[52px] bg-primary text-white rounded-xl text-[15px] font-semibold disabled:bg-disabled"
                 >
-                  요리 추천 받기
+                  {selected.size > 0 ? `재료 ${selected.size}개로 추천 받기` : '요리 추천 받기'}
                 </button>
               </div>
             )}
