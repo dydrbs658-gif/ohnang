@@ -202,6 +202,16 @@ Step 10: 마이 탭 / 대시보드 ✅
   - supabase/migrations/006_party_members.sql (my_party_id() SECURITY DEFINER + 파티 멤버 조회 정책)
   - app/(tabs)/my/page.js (파티 카드, 이번 달 리포트, 먹은 비율, 설정 메뉴)
   - app/my/party/page.js (파티명 수정, 초대코드 복사, 멤버 목록, 파티 합류)
+Step 11-B: 브랜딩 확정 ✅
+  - 앱 이름: **신선고** (신선 + 냉장고), appId: com.sinseongo.app
+  - components/BrandLogo.js (BrandSymbol/BrandLogo/BrandHero — 미니멀 냉장고+잎사귀 심볼)
+  - resources/icon.svg (앱 아이콘 원본 1024px) + resources/README.md (에셋 생성 절차)
+  - 적용처: HomeHeader 워드마크, 온보딩 히어로, 홈 빈 화면, layout.js title, capacitor.config.js
+Step 11: 런칭 전 UX 보강 ✅
+  - supabase/migrations/007_shopping_list.sql (shopping_items 테이블 + RLS + Realtime)
+  - app/(tabs)/shopping/page.js (파티 공유 장보기: 추가/체크/삭제, 구매 완료 → 재고 등록 프리필)
+  - app/(tabs)/home/page.js (먹었어요/버렸어요 토스트에 "장보기 추가" 액션, 재고 검색, 스와이프 1회 힌트)
+  - components/HomeHeader.js (검색 버튼)
 ```
 
 ---
@@ -209,7 +219,7 @@ Step 10: 마이 탭 / 대시보드 ✅
 ## 배포 체크리스트 (Steps 7~10 백엔드)
 0. **익명 인증 활성화 (필수, 현재 꺼져 있음)**: Dashboard > Authentication > Sign In / Providers > Anonymous sign-ins ON
    — 꺼져 있으면 온보딩에서 "연결에 실패했어요" 에러가 뜬다
-1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`
+1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`, `007_shopping_list.sql` (장보기 탭 — 미실행 시 장보기 탭에서 에러)
 2. **Edge Function 배포**: `supabase functions deploy barcode-lookup recommend-recipe send-expiry-notifications`
 3. **시크릿 설정** (`supabase secrets set`):
    - `FOOD_SAFETY_API_KEY` — 식품안전나라 OpenAPI 키 (barcode-lookup)
