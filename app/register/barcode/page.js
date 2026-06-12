@@ -67,7 +67,7 @@ export default function BarcodeRegisterPage() {
   // ── 네이티브(ML Kit) 스캔 ──────────────────────────────────
   const scanNative = useCallback(async () => {
     try {
-      const { BarcodeScanner } = await import('@capacitor-mlkit/barcode-scanning');
+      const { BarcodeScanner } = await import(/* webpackIgnore: true */ '@capacitor-mlkit/barcode-scanning');
       const { camera } = await BarcodeScanner.requestPermissions();
       if (camera !== 'granted' && camera !== 'limited') {
         setCameraOk(false);
