@@ -1,0 +1,12 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 신선고 앱 아이콘 — components/BrandLogo.js 심볼과 동일 도형 -->
+  <rect width="1024" height="1024" fill="#1D6AE5"/>
+  <!-- 냉장고 바디 -->
+  <rect x="322" y="192" width="380" height="640" rx="78" stroke="#FFFFFF" stroke-width="52"/>
+  <!-- 냉동/냉장 분할선 -->
+  <line x1="322" y1="400" x2="702" y2="400" stroke="#FFFFFF" stroke-width="52"/>
+  <!-- 손잡이 -->
+  <line x1="624" y1="488" x2="624" y2="560" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round"/>
+  <!-- 잎사귀 (신선) -->
+  <path d="M598 560 C598 664 538 720 426 720 C426 616 486 560 598 560 Z" fill="#6EE7B7"/>
+</svg>

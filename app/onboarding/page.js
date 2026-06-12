@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Refrigerator, Camera, Bell, ChefHat } from 'lucide-react';
+import { Camera, Bell, ChefHat } from 'lucide-react';
+import { BrandHero } from '@/components/BrandLogo';
 
 export default function OnboardingIntroPage() {
   const router = useRouter();
@@ -31,14 +32,10 @@ export default function OnboardingIntroPage() {
   return (
     <div className="flex flex-col h-full bg-bg px-5 pt-safe">
       <div className="flex-1 flex flex-col items-center justify-center gap-10">
-        <div
-          className="w-32 h-32 rounded-3xl flex items-center justify-center"
-          style={{ backgroundColor: '#EFF4FF' }}
-        >
-          <Refrigerator size={64} color="#1D6AE5" />
-        </div>
+        <BrandHero size={128} />
 
         <div className="text-center">
+          <p className="text-[15px] font-bold text-primary mb-2">신선고</p>
           <h1 className="text-[26px] font-bold text-text leading-snug">
             유통기한,<br />이제 신경 쓰지 마세요
           </h1>

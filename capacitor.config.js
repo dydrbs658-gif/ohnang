@@ -1,7 +1,7 @@
 /** @type {import('@capacitor/cli').CapacitorConfig} */
 const config = {
-  appId: 'com.ohnang.app',
-  appName: '오냥',
+  appId: 'com.sinseongo.app',
+  appName: '신선고',
   webDir: 'out',
   server: {
     androidScheme: 'https',

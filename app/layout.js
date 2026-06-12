@@ -2,8 +2,8 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: '오냥 - 유통기한 재고 관리',
-  description: '사진 한 장으로 등록, 임박하면 알림',
+  title: '신선고 - 유통기한 재고 관리',
+  description: '사진 한 장으로 등록하고, 기한이 임박하면 알려드려요',
 };
 
 export const viewport = {
