@@ -207,6 +207,12 @@ Step 11-B: 브랜딩 확정 ✅
   - components/BrandLogo.js (BrandSymbol/BrandLogo/BrandHero — 미니멀 냉장고+잎사귀 심볼)
   - resources/icon.svg (앱 아이콘 원본 1024px) + resources/README.md (에셋 생성 절차)
   - 적용처: HomeHeader 워드마크, 온보딩 히어로, 홈 빈 화면, layout.js title, capacitor.config.js
+Step 12-B: 사용성 버그 수정 ✅
+  - components/FormFields.js: 단위 연동 수량(QuantityUnitField — 단위 선택 시 수량·증감폭 자동), 누적 기한 칩(ExpiryDateField), fmtQty
+  - supabase/migrations/008_quantity_numeric.sql: 수량 INT → NUMERIC(8,2) (kg/L 소수점)
+  - components/SwipeableItem.js: Pointer Events 전환 — 마우스 스와이프 지원 (PC 테스트 가능)
+  - my 탭: 소비 기록 없을 때 안내 카드 표시 (대시보드 빈 화면 문제)
+  - register/manual + item/edit 공용 필드 적용
 Step 12: 사용성 개선 (고객 관점) ✅
   - register/manual: 단위 빠른 선택 칩(개/팩/병/g/kg/ml/L/봉지), 유통기한 프리셋 칩(+3일~+3개월)
   - recipe: 재료 직접 선택 → 추천 (임박 재료 기본 선택, 선택 재료 필수 사용)
@@ -224,7 +230,7 @@ Step 11: 런칭 전 UX 보강 ✅
 ## 배포 체크리스트 (Steps 7~10 백엔드)
 0. **익명 인증 활성화 (필수, 현재 꺼져 있음)**: Dashboard > Authentication > Sign In / Providers > Anonymous sign-ins ON
    — 꺼져 있으면 온보딩에서 "연결에 실패했어요" 에러가 뜬다
-1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`, `007_shopping_list.sql` (장보기 탭 — 미실행 시 장보기 탭에서 에러)
+1. **SQL 마이그레이션 실행** (Dashboard > SQL Editor): `005_push_tokens.sql`, `006_party_members.sql`, `007_shopping_list.sql` (장보기 탭 — 미실행 시 장보기 탭에서 에러), `008_quantity_numeric.sql` (수량 소수점 — 미실행 시 0.5kg 등 등록 실패)
 2. **Edge Function 배포**: `supabase functions deploy barcode-lookup recommend-recipe send-expiry-notifications`
 3. **시크릿 설정** (`supabase secrets set`):
    - `FOOD_SAFETY_API_KEY` — 식품안전나라 OpenAPI 키 (barcode-lookup)

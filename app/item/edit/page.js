@@ -8,6 +8,7 @@ import SkeletonItem from '@/components/SkeletonItem';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { calcEffectiveExpiry } from '@/lib/calcExpiry';
+import { QuantityUnitField, ExpiryDateField } from '@/components/FormFields';
 
 const STORAGE_TYPES = [
   { value: 'fridge',     label: '냉장' },
@@ -39,34 +40,6 @@ function Toggle({ value, onChange }) {
         }`}
       />
     </button>
-  );
-}
-
-function QuantityStepper({ value, onChange }) {
-  return (
-    <div className="flex items-center bg-bg border border-border rounded-xl overflow-hidden flex-1">
-      <button
-        type="button"
-        onClick={() => onChange(Math.max(1, value - 1))}
-        className="w-12 h-[52px] flex items-center justify-center text-subtext text-[22px] font-light active:bg-border transition-colors"
-      >
-        −
-      </button>
-      <input
-        type="number"
-        value={value}
-        onChange={e => onChange(Math.max(1, Number(e.target.value) || 1))}
-        className="flex-1 text-center h-[52px] bg-transparent text-[15px] text-text outline-none"
-        min={1}
-      />
-      <button
-        type="button"
-        onClick={() => onChange(value + 1)}
-        className="w-12 h-[52px] flex items-center justify-center text-subtext text-[22px] font-light active:bg-border transition-colors"
-      >
-        +
-      </button>
-    </div>
   );
 }
 
@@ -171,7 +144,7 @@ function ItemEditContent() {
         setForm({
           name:              data.name,
           storage_type:      data.storage_type,
-          quantity:          data.quantity,
+          quantity:          parseFloat(data.quantity) || 1,
           unit:              data.unit,
           label_expiry_date: data.label_expiry_date ?? '',
           purchase_date:     data.purchase_date ?? today(),
@@ -224,7 +197,7 @@ function ItemEditContent() {
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = '품목명을 입력해주세요';
-    if (!form.quantity || form.quantity < 1) e.quantity = '수량을 입력해주세요';
+    if (!form.quantity || parseFloat(form.quantity) <= 0) e.quantity = '수량을 입력해주세요';
     return e;
   };
 
@@ -384,24 +357,16 @@ function ItemEditContent() {
             </div>
           </div>
 
-          {/* 수량 + 단위 */}
-          <div>
-            <p className="text-[13px] text-subtext mb-1">수량</p>
-            <div className="flex gap-3">
-              <QuantityStepper value={form.quantity} onChange={v => set('quantity', v)} />
-              <input
-                type="text"
-                value={form.unit}
-                onChange={e => set('unit', e.target.value)}
-                placeholder="단위"
-                className="w-20 h-[52px] bg-bg border border-border rounded-xl px-3 text-[15px] text-center text-text outline-none focus:border-primary"
-              />
-            </div>
-          </div>
+          {/* 수량 + 단위 (단위 선택 시 수량 자동 보정) */}
+          <QuantityUnitField
+            quantity={form.quantity}
+            unit={form.unit}
+            onQuantityChange={v => set('quantity', v)}
+            onUnitChange={v => set('unit', v)}
+          />
 
-          {/* 유통기한 */}
-          <DateInput
-            label="유통기한"
+          {/* 유통기한 (칩 누를 때마다 누적 더하기) */}
+          <ExpiryDateField
             value={form.label_expiry_date}
             onChange={v => set('label_expiry_date', v)}
           />

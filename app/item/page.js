@@ -9,6 +9,7 @@ import SkeletonItem from '@/components/SkeletonItem';
 import { supabase } from '@/lib/supabase';
 import { getDday, getDdayLabel, getDdayStyle } from '@/lib/dday';
 import CategoryIcon, { STORAGE_META } from '@/components/CategoryIcon';
+import { fmtQty } from '@/components/FormFields';
 
 const STORAGE_LABEL = {
   fridge: '냉장', freezer: '냉동', pantry: '실온', supplement: '영양제', etc: '기타',
@@ -156,7 +157,7 @@ function ItemDetail() {
             <div className="flex-1 min-w-0 pt-1">
               <p className="text-[20px] font-bold text-text leading-snug">{item.name}</p>
               <p className="text-[13px] text-subtext mt-0.5">
-                {item.quantity}{item.unit} · {cat.label}
+                {fmtQty(item.quantity)}{item.unit} · {cat.label}
               </p>
             </div>
 
@@ -204,7 +205,7 @@ function ItemDetail() {
             />
           )}
           <InfoRow label="보관 위치" value={STORAGE_LABEL[item.storage_type] ?? item.storage_type} />
-          <InfoRow label="수량"      value={`${item.quantity}${item.unit}`} />
+          <InfoRow label="수량"      value={`${fmtQty(item.quantity)}${item.unit}`} />
           <InfoRow label="구매일"    value={formatDate(item.purchase_date)} />
           {item.is_opened && item.opened_at && (
             <InfoRow label="개봉일"    value={formatDate(item.opened_at)} />

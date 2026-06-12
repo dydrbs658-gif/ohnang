@@ -121,7 +121,7 @@ export default function MyPage() {
               <StatCard label="버렸어요" value={stats?.discarded} accent="#EF4444" />
             </div>
 
-            {eatenPct !== null && (
+            {eatenPct !== null ? (
               <div className="mt-3 bg-surface border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[13px] text-subtext">버리지 않고 먹은 비율</p>
@@ -139,6 +139,14 @@ export default function MyPage() {
                     : eatenPct >= 50
                       ? '잘하고 있어요. 임박 알림을 활용해보세요'
                       : '버려지는 식품이 많아요. 요리 추천을 활용해보세요'}
+                </p>
+              </div>
+            ) : stats !== null && (
+              <div className="mt-3 bg-surface border border-border rounded-xl p-4">
+                <p className="text-[13px] text-text font-medium">아직 이번 달 소비 기록이 없어요</p>
+                <p className="text-[12px] text-subtext mt-1 leading-relaxed">
+                  다 먹은 재고를 홈에서 옆으로 밀어 기록하면<br />
+                  버리지 않고 먹은 비율을 여기서 볼 수 있어요
                 </p>
               </div>
             )}

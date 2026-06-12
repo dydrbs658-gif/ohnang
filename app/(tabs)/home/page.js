@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Camera, Barcode, PenLine, AlertCircle, CheckCircle2, Search, X, Hand } from 'lucide-react';
 import { BrandSymbol } from '@/components/BrandLogo';
+import { fmtQty } from '@/components/FormFields';
 import HomeHeader from '@/components/HomeHeader';
 import SwipeableItem from '@/components/SwipeableItem';
 import DdayBadge from '@/components/DdayBadge';
@@ -264,7 +265,7 @@ export default function HomePage() {
                                 {item.name}
                               </p>
                               <p className="text-[13px] text-subtext mt-0.5">
-                                {item.quantity}{item.unit} · {cat.label}
+                                {fmtQty(item.quantity)}{item.unit} · {cat.label}
                                 {item.is_opened ? ' · 개봉' : ''}
                                 {item.is_frozen ? ' · 냉동 중' : ''}
                               </p>

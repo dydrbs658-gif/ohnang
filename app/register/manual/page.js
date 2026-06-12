@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { calcEffectiveExpiry } from '@/lib/calcExpiry';
+import { QuantityUnitField, ExpiryDateField } from '@/components/FormFields';
 
 const STORAGE_TYPES = [
   { value: 'fridge',     label: '냉장' },
@@ -16,24 +17,8 @@ const STORAGE_TYPES = [
   { value: 'etc',        label: '기타' },
 ];
 
-const COMMON_UNITS = ['개', '팩', '병', 'g', 'kg', 'ml', 'L', '봉지'];
-
-const EXPIRY_PRESETS = [
-  { label: '+3일',   days: 3 },
-  { label: '+1주',   days: 7 },
-  { label: '+2주',   days: 14 },
-  { label: '+1개월', days: 30 },
-  { label: '+3개월', days: 90 },
-];
-
 function today() {
   return new Date().toISOString().split('T')[0];
-}
-
-function addDays(days) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
 }
 
 // ─── Toggle 컴포넌트 ────────────────────────────────────────
@@ -53,35 +38,6 @@ function Toggle({ value, onChange }) {
         }`}
       />
     </button>
-  );
-}
-
-// ─── 수량 스텝퍼 ─────────────────────────────────────────────
-function QuantityStepper({ value, onChange }) {
-  return (
-    <div className="flex items-center bg-bg border border-border rounded-xl overflow-hidden flex-1">
-      <button
-        type="button"
-        onClick={() => onChange(Math.max(1, value - 1))}
-        className="w-12 h-[52px] flex items-center justify-center text-subtext text-[22px] font-light active:bg-border transition-colors"
-      >
-        −
-      </button>
-      <input
-        type="number"
-        value={value}
-        onChange={e => onChange(Math.max(1, Number(e.target.value) || 1))}
-        className="flex-1 text-center h-[52px] bg-transparent text-[15px] text-text outline-none"
-        min={1}
-      />
-      <button
-        type="button"
-        onClick={() => onChange(value + 1)}
-        className="w-12 h-[52px] flex items-center justify-center text-subtext text-[22px] font-light active:bg-border transition-colors"
-      >
-        +
-      </button>
-    </div>
   );
 }
 
@@ -205,7 +161,7 @@ export default function ManualRegisterPage() {
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = '품목명을 입력해주세요';
-    if (!form.quantity || form.quantity < 1) e.quantity = '수량을 입력해주세요';
+    if (!form.quantity || parseFloat(form.quantity) <= 0) e.quantity = '수량을 입력해주세요';
     return e;
   };
 
@@ -329,74 +285,26 @@ export default function ManualRegisterPage() {
             </div>
           </div>
 
-          {/* 수량 + 단위 */}
-          <div>
-            <p className="text-[13px] text-subtext mb-1">수량</p>
-            <div className="flex gap-3">
-              <QuantityStepper value={form.quantity} onChange={v => set('quantity', v)} />
-              <input
-                type="text"
-                value={form.unit}
-                onChange={e => set('unit', e.target.value)}
-                placeholder="단위"
-                className="w-20 h-[52px] bg-bg border border-border rounded-xl px-3 text-[15px] text-center text-text outline-none focus:border-primary"
-              />
-            </div>
-            {/* 단위 빠른 선택 */}
-            <div className="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
-              {COMMON_UNITS.map(u => (
-                <button
-                  key={u}
-                  type="button"
-                  onClick={() => set('unit', u)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
-                    form.unit === u
-                      ? 'bg-primary text-white'
-                      : 'bg-surface border border-border text-subtext'
-                  }`}
-                >
-                  {u}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* 수량 + 단위 (단위 선택 시 수량 자동 보정) */}
+          <QuantityUnitField
+            quantity={form.quantity}
+            unit={form.unit}
+            onQuantityChange={v => set('quantity', v)}
+            onUnitChange={v => set('unit', v)}
+          />
 
-          {/* 유통기한 */}
-          <div>
-            <DateInput
-              label="유통기한"
-              value={form.label_expiry_date}
-              onChange={v => set('label_expiry_date', v)}
-              hint={
-                !form.label_expiry_date
-                  ? catalog
-                    ? `카탈로그 기준 자동 계산돼요 (구매일로부터 ${catalog.shelf_days}일)`
-                    : '입력 안 하면 날짜 미정으로 등록돼요'
-                  : undefined
-              }
-            />
-            {/* 기한 빠른 선택 */}
-            <div className="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
-              {EXPIRY_PRESETS.map(p => {
-                const date = addDays(p.days);
-                const active = form.label_expiry_date === date;
-                return (
-                  <button
-                    key={p.days}
-                    type="button"
-                    onClick={() => set('label_expiry_date', active ? '' : date)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
-                      active
-                        ? 'bg-primary text-white'
-                        : 'bg-surface border border-border text-subtext'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* 유통기한 (칩 누를 때마다 누적 더하기) */}
+          <ExpiryDateField
+            value={form.label_expiry_date}
+            onChange={v => set('label_expiry_date', v)}
+            hint={
+              !form.label_expiry_date
+                ? catalog
+                  ? `카탈로그 기준 자동 계산돼요 (구매일로부터 ${catalog.shelf_days}일)`
+                  : '입력 안 하면 날짜 미정으로 등록돼요'
+                : undefined
+            }
+          />
 
           {/* 개봉 여부 */}
           <div className="bg-surface border border-border rounded-xl overflow-hidden">
